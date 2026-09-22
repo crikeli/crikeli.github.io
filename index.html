@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kelin Christi</title>
+<meta name="description" content="Kelin Christi — geospatial engineer, Seattle WA. Python-based GIS pipelines, computer vision, and cloud-native raster tools built on real King County and Seattle public data.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --bg: #f7f5f0;
+    --surface: #ffffff;
+    --ink: #1b1f1c;
+    --ink-soft: #565f59;
+    --ink-faint: #8b948d;
+    --accent: #1f6f54;
+    --accent-ink: #17543f;
+    --accent-soft: #e6efe9;
+    --rule: #dfdcd2;
+    --shadow: 0 1px 2px rgba(27, 31, 28, 0.05), 0 8px 24px rgba(27, 31, 28, 0.05);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #13171a;
+      --surface: #191e20;
+      --ink: #eceee9;
+      --ink-soft: #a6b0aa;
+      --ink-faint: #6d766f;
+      --accent: #5fc79a;
+      --accent-ink: #8fdbb8;
+      --accent-soft: #1c2b24;
+      --rule: #2a3330;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #13171a;
+    --surface: #191e20;
+    --ink: #eceee9;
+    --ink-soft: #a6b0aa;
+    --ink-faint: #6d766f;
+    --accent: #5fc79a;
+    --accent-ink: #8fdbb8;
+    --accent-soft: #1c2b24;
+    --rule: #2a3330;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Source Sans 3", -apple-system, "Segoe UI", sans-serif;
+    padding-inline: 24px;
+  }
+
+  .wrap { max-width: 880px; margin-inline: auto; }
+
+  a { color: var(--accent-ink); }
+
+  /* ---------- nav ---------- */
+
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .nav-inner {
+    max-width: 880px;
+    margin-inline: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-block: 14px;
+  }
+
+  .nav-name {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600;
+    font-size: 1.05rem;
+    text-decoration: none;
+    color: var(--ink);
+  }
+
+  .nav-links { display: flex; gap: 22px; }
+
+  .nav-links a {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink-soft);
+  }
+  .nav-links a:hover { color: var(--accent-ink); }
+
+  /* ---------- hero ---------- */
+
+  header.hero {
+    position: relative;
+    overflow: hidden;
+    padding-block: 72px 56px;
+    border-bottom: 1px solid var(--rule);
+    margin-inline: -24px;
+    padding-inline: 24px;
+  }
+
+  .hero-contours {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    color: var(--rule);
+    z-index: 0;
+  }
+
+  .hero-inner { position: relative; z-index: 1; max-width: 880px; margin-inline: auto; }
+
+  .eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    background: var(--accent-soft);
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 100px;
+    margin-bottom: 18px;
+  }
+
+  h1.name {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600;
+    font-size: clamp(2.6rem, 7vw, 4rem);
+    line-height: 1.02;
+    letter-spacing: -0.01em;
+    margin: 0 0 10px;
+    text-wrap: balance;
+  }
+
+  .tagline {
+    font-size: clamp(1.05rem, 2.4vw, 1.3rem);
+    color: var(--ink-soft);
+    max-width: 46ch;
+    line-height: 1.5;
+    margin: 0 0 22px;
+  }
+
+  .coords {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.82rem;
+    color: var(--ink-faint);
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+
+  /* ---------- sections ---------- */
+
+  section { padding-block: 56px; border-bottom: 1px solid var(--rule); }
+  section:last-of-type { border-bottom: none; }
+
+  .section-label {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    margin: 0 0 20px;
+  }
+
+  /* ---------- about ---------- */
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+
+  .headshot {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 10px;
+    object-fit: cover;
+    object-position: 50% 22%;
+    box-shadow: var(--shadow);
+  }
+
+  .about-body p {
+    font-size: 1.02rem;
+    line-height: 1.68;
+    color: var(--ink);
+    margin: 0 0 16px;
+  }
+
+  .pull-quote {
+    font-family: "Fraunces", Georgia, serif;
+    font-style: italic;
+    font-size: 1.08rem;
+    line-height: 1.5;
+    color: var(--ink);
+    border-left: 3px solid var(--accent);
+    padding-left: 16px;
+    margin: 20px 0 6px;
+  }
+
+  .pull-quote-cite {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-style: normal;
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+    border-left: 3px solid transparent;
+    padding-left: 16px;
+    margin: 0 0 20px;
+  }
+
+  .skills {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 20px;
+  }
+
+  .skill-row {
+    display: flex;
+    gap: 10px;
+    font-size: 0.88rem;
+    line-height: 1.6;
+  }
+
+  .skill-row dt {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    flex: 0 0 130px;
+    padding-top: 2px;
+  }
+
+  .skill-row dd { margin: 0; color: var(--ink-soft); }
+
+  @media (max-width: 560px) {
+    .about-grid { grid-template-columns: 1fr; }
+    .headshot { width: 180px; }
+    .skill-row { flex-direction: column; gap: 2px; }
+    .skill-row dt { flex: none; }
+  }
+
+  /* ---------- projects ---------- */
+
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 18px;
+  }
+
+  .project-card {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: var(--shadow);
+    transition: transform 0.12s ease, border-color 0.12s ease;
+  }
+  .project-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+
+  .project-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  .project-title {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600;
+    font-size: 1.12rem;
+    color: var(--ink);
+  }
+
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    white-space: nowrap;
+  }
+  .status::before {
+    content: "";
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .project-desc {
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    flex: 1;
+  }
+
+  .stack-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .stack-tag {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.68rem;
+    color: var(--accent-ink);
+    background: var(--accent-soft);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .project-link {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.78rem;
+    color: var(--accent-ink);
+  }
+
+  /* ---------- contact / footer ---------- */
+
+  .contact-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 28px;
+    font-size: 0.98rem;
+  }
+
+  .contact-row a {
+    text-decoration: none;
+    color: var(--ink);
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 2px;
+  }
+  .contact-row a:hover { color: var(--accent-ink); border-color: var(--accent); }
+
+  footer {
+    padding-block: 28px 48px;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.72rem;
+    color: var(--ink-faint);
+  }
+</style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <a class="nav-name" href="#top">Kelin Christi</a>
+      <div class="nav-links">
+        <a href="#about">About</a>
+        <a href="#projects">Projects</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero" id="top">
+    <svg class="hero-contours" viewBox="0 0 36.5 22.3" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+<path d="M 0.0,4.6 L 0.4,4.5 L 0.0,4.5 M 2.4,22.3 L 2.6,22.2 L 2.7,22.3 M 4.3,22.3 L 3.8,21.9 L 2.6,21.8 L 2.2,21.9 L 1.8,21.5 L 0.0,21.5 M 0.0,0.3 L 0.3,0.4 L 0.1,0.0 M 0.7,0.6 L 0.8,0.7 L 0.7,0.6 M 0.0,8.9 L 0.3,9.1 L 1.2,9.4 L 1.8,9.8 L 2.2,10.4 L 2.4,11.3 L 2.4,9.8 L 2.6,9.6 L 4.2,10.7 L 4.9,11.6 L 5.4,11.8 L 4.7,10.8 L 4.7,10.5 L 5.2,10.2 L 5.8,10.4 L 6.0,10.4 L 6.0,10.2 L 5.6,10.0 L 4.5,9.7 L 2.8,8.2 L 1.9,7.7 L 1.4,7.0 L 1.6,6.7 L 1.4,6.2 L 1.6,5.9 L 1.0,5.8 L 0.7,5.3 L 1.3,4.6 L 2.8,3.9 L 4.6,4.0 L 6.2,4.4 L 6.8,4.4 L 7.1,4.1 L 6.1,3.7 L 5.7,3.2 L 4.9,2.9 L 3.4,2.9 L 2.8,2.7 L 1.5,2.7 L 0.0,3.0 M 5.6,22.3 L 4.6,21.6 L 4.2,21.7 L 2.8,21.0 L 2.6,21.1 L 2.0,21.1 L 1.5,20.8 L 1.2,21.0 L 0.7,20.9 L 0.4,21.0 L 0.0,21.0 M 9.1,22.3 L 9.6,21.8 L 9.6,20.7 L 9.4,20.5 L 9.3,21.2 L 8.6,22.3 M 28.2,22.3 L 28.1,22.1 L 27.9,22.3 M 34.1,22.3 L 34.7,20.6 L 34.2,18.5 L 34.3,18.1 L 33.9,16.3 L 33.7,15.7 L 33.4,16.2 L 33.0,16.4 L 33.5,17.2 L 33.4,17.8 L 33.8,19.3 L 33.6,20.6 L 33.2,20.8 L 33.1,22.3 M 1.9,0.0 L 2.3,0.9 L 2.3,0.0 M 15.3,0.0 L 15.5,0.3 L 15.7,0.0 M 35.3,0.0 L 35.0,2.0 L 34.6,3.0 L 34.6,4.2 L 35.6,2.4 L 35.8,0.5 L 36.1,0.0 M 0.0,9.6 L 0.4,9.5 L 1.6,10.2 L 1.9,11.2 L 1.9,11.6 L 0.7,11.9 L 0.4,12.4 L 1.4,12.1 L 1.9,12.2 L 2.3,13.4 L 2.2,14.9 L 2.5,14.5 L 2.5,13.8 L 2.9,13.1 L 2.8,10.5 L 3.0,10.4 L 3.5,10.6 L 5.2,12.3 L 5.5,13.3 L 5.8,13.7 L 5.8,14.3 L 7.2,15.7 L 6.5,14.4 L 6.5,13.0 L 5.9,11.9 L 5.3,11.1 L 5.1,10.7 L 5.3,10.6 L 6.3,11.1 L 7.9,12.0 L 8.5,12.1 L 8.9,11.9 L 7.7,11.5 L 7.5,11.0 L 6.9,10.4 L 5.7,9.6 L 4.6,9.4 L 4.0,8.4 L 3.6,8.4 L 3.2,8.0 L 2.4,7.5 L 2.8,7.0 L 2.7,6.4 L 3.6,6.3 L 5.1,6.6 L 5.3,6.5 L 5.2,6.3 L 4.3,5.8 L 2.5,5.5 L 2.0,5.2 L 2.2,4.7 L 2.7,4.5 L 3.5,4.3 L 4.5,4.4 L 5.5,4.6 L 5.8,4.9 L 7.8,5.1 L 9.3,6.6 L 9.3,6.1 L 8.8,5.3 L 8.7,4.7 L 9.1,4.4 L 10.0,4.4 L 10.0,4.2 L 9.8,4.0 L 9.1,3.6 L 7.3,3.8 L 6.7,3.7 L 6.4,3.4 L 6.4,3.1 L 5.4,2.5 L 2.4,1.4 L 1.7,0.6 L 1.5,0.0 M 36.5,17.4 L 35.6,17.3 L 34.7,17.5 L 34.3,16.7 L 34.1,15.5 L 35.4,13.2 L 35.3,12.4 L 34.4,12.6 L 34.6,13.1 L 34.5,13.4 L 33.5,14.7 L 33.1,15.8 L 31.8,15.2 L 30.5,14.2 L 30.1,14.2 L 30.4,15.0 L 30.7,15.4 L 32.7,16.8 L 32.9,17.1 L 32.9,17.6 L 33.3,19.1 L 33.0,19.6 L 33.1,20.0 L 32.8,20.6 L 32.5,22.3 M 7.4,22.3 L 7.1,22.0 L 5.3,21.6 L 5.1,21.4 L 5.6,21.1 L 5.6,21.0 L 4.5,20.9 L 4.1,21.0 L 3.4,20.7 L 3.1,20.2 L 2.6,19.9 L 2.4,20.5 L 2.2,20.6 L 1.3,20.3 L 1.1,20.6 L 0.4,20.3 L 0.0,20.6 M 9.8,22.3 L 10.2,21.6 L 10.2,21.1 L 10.0,20.4 L 10.0,19.4 L 9.8,19.2 L 9.4,19.1 L 9.2,18.8 L 9.2,17.5 L 8.3,18.0 L 8.3,18.6 L 9.0,20.2 L 9.0,20.9 L 8.6,21.7 L 8.0,22.3 M 12.7,22.3 L 13.2,20.9 L 13.1,20.5 L 12.2,20.9 L 11.1,22.3 M 15.4,22.3 L 15.4,21.5 L 16.2,20.7 L 16.2,20.3 L 15.7,20.4 L 15.1,21.1 L 14.5,21.3 L 13.9,22.3 M 29.2,22.3 L 28.5,20.8 L 28.0,20.7 L 27.7,19.9 L 26.8,19.2 L 26.8,19.8 L 27.5,20.7 L 27.2,21.5 L 26.8,21.5 L 24.4,20.7 L 25.5,21.6 L 25.7,22.0 L 26.7,22.3 M 35.7,22.3 L 35.7,21.8 L 35.4,21.4 L 35.3,20.8 L 35.0,20.5 L 34.8,19.8 L 35.0,18.3 L 35.1,18.0 L 35.4,17.9 L 36.5,18.0 M 14.9,0.0 L 14.4,0.9 L 15.3,0.6 L 16.1,1.3 L 16.3,1.1 L 16.0,0.5 L 16.0,0.0 M 22.3,0.0 L 22.5,1.2 L 22.8,1.0 L 23.1,0.0 M 35.0,0.0 L 34.7,1.7 L 33.4,4.6 L 32.3,5.4 L 31.1,5.9 L 29.7,6.3 L 29.8,6.7 L 29.6,7.3 L 30.0,7.1 L 31.8,6.8 L 33.7,6.0 L 34.2,7.2 L 34.4,7.3 L 34.6,6.0 L 36.0,3.2 L 36.3,1.1 L 36.5,0.8 M 0.0,10.3 L 0.2,10.4 L 0.5,10.3 L 0.9,10.7 L 1.3,10.7 L 1.5,11.1 L 1.0,11.2 L 0.0,11.8 M 36.5,12.9 L 35.9,12.6 L 35.8,12.4 L 35.9,11.9 L 36.4,11.0 L 35.7,11.0 L 34.8,12.0 L 34.3,11.7 L 33.7,12.2 L 32.8,12.2 L 33.9,12.9 L 34.2,13.3 L 33.6,13.9 L 32.9,15.3 L 31.8,14.9 L 30.7,13.9 L 30.0,13.7 L 29.1,13.8 L 30.9,15.9 L 30.9,16.4 L 31.8,16.6 L 32.4,17.1 L 32.2,17.7 L 32.7,18.3 L 32.5,19.1 L 32.4,19.4 L 31.8,19.7 L 32.2,20.0 L 32.4,20.5 L 32.1,22.3 M 0.0,13.5 L 0.4,13.2 L 0.9,13.1 L 1.1,12.8 L 1.5,12.6 L 1.9,13.3 L 1.6,13.8 L 1.3,14.0 L 1.6,14.3 L 1.7,15.0 L 1.4,15.5 L 1.8,15.8 L 2.1,16.7 L 2.5,17.2 L 2.8,17.4 L 3.2,17.3 L 3.3,17.0 L 2.9,16.5 L 2.7,15.5 L 3.0,14.3 L 2.9,13.8 L 3.3,13.4 L 3.1,12.2 L 3.2,11.6 L 3.4,11.2 L 3.7,11.2 L 5.0,12.6 L 5.3,14.1 L 5.0,15.6 L 5.0,16.5 L 5.5,16.3 L 5.7,15.8 L 6.1,15.3 L 6.5,15.5 L 7.2,16.5 L 7.7,16.8 L 8.6,16.4 L 9.3,15.7 L 8.1,15.9 L 7.6,15.8 L 6.8,14.3 L 7.0,13.3 L 7.3,13.0 L 6.5,12.6 L 6.0,11.4 L 6.3,11.4 L 7.6,12.3 L 8.1,12.4 L 9.7,12.2 L 10.2,11.9 L 10.0,11.7 L 8.5,11.3 L 8.1,10.8 L 7.6,10.6 L 7.1,10.0 L 6.3,9.8 L 5.8,9.3 L 5.3,9.3 L 5.1,9.0 L 4.7,9.0 L 4.5,8.1 L 3.9,7.8 L 3.9,7.3 L 5.0,6.9 L 5.8,6.9 L 6.6,6.6 L 6.7,6.5 L 3.5,5.2 L 3.6,4.8 L 4.0,4.7 L 5.4,5.1 L 5.8,5.3 L 6.3,5.3 L 6.6,5.4 L 7.7,5.5 L 8.8,6.6 L 9.1,7.5 L 10.3,8.3 L 10.5,8.1 L 10.3,7.5 L 9.6,5.8 L 9.1,5.4 L 9.0,5.0 L 9.5,4.8 L 10.5,4.9 L 10.9,4.3 L 10.3,3.9 L 9.8,3.4 L 9.1,3.3 L 7.9,3.5 L 7.2,3.3 L 7.3,2.6 L 8.0,2.2 L 7.9,1.3 L 7.6,1.4 L 7.0,1.9 L 6.6,2.6 L 6.4,2.6 L 4.9,1.7 L 5.1,1.5 L 6.0,1.4 L 6.1,1.2 L 5.9,0.9 L 4.1,1.0 L 3.6,0.8 L 2.9,0.0 M 36.5,17.0 L 35.6,16.9 L 34.8,17.0 L 34.6,15.9 L 34.8,14.8 L 35.5,13.8 L 36.1,13.6 L 36.5,13.9 M 0.0,17.4 L 0.2,17.3 L 0.3,16.8 L 0.0,16.2 M 27.1,18.5 L 27.3,18.7 L 27.1,18.5 M 0.0,18.7 L 0.2,18.4 L 0.0,18.2 M 27.6,19.0 L 28.0,19.3 L 28.1,19.8 L 27.6,19.0 M 36.5,21.1 L 35.8,21.0 L 35.2,19.8 L 35.4,18.3 L 35.8,18.2 L 36.5,18.4 M 13.3,22.3 L 13.4,21.9 L 13.7,21.6 L 13.4,22.3 M 15.7,22.3 L 15.8,21.5 L 16.2,21.0 L 17.5,21.1 L 18.3,20.6 L 18.3,20.5 L 17.5,20.7 L 16.7,20.3 L 17.6,19.6 L 18.1,19.0 L 17.2,19.2 L 16.7,18.9 L 15.9,19.6 L 15.0,20.6 L 14.6,20.6 L 14.6,20.0 L 15.1,19.4 L 15.1,19.0 L 14.7,18.9 L 14.1,19.1 L 12.7,20.2 L 12.0,20.3 L 11.6,21.0 L 10.7,21.6 L 10.3,20.1 L 10.4,18.9 L 9.6,18.1 L 9.8,17.3 L 10.6,17.0 L 10.8,16.8 L 10.7,16.7 L 9.4,16.7 L 9.0,17.2 L 8.2,17.3 L 8.0,17.2 L 7.7,16.9 L 7.6,17.0 L 7.6,17.3 L 8.3,19.1 L 8.5,19.7 L 8.8,20.4 L 8.7,21.0 L 8.0,21.9 L 7.3,21.6 L 6.1,21.4 L 6.5,20.9 L 6.4,19.6 L 6.2,19.3 L 5.9,20.4 L 5.2,20.5 L 4.9,20.6 L 4.4,20.4 L 3.9,20.4 L 3.5,20.0 L 3.9,19.6 L 3.8,19.4 L 3.0,19.2 L 1.9,18.4 L 1.7,18.6 L 1.8,19.3 L 1.6,20.0 L 0.9,19.5 L 0.4,19.8 L 0.0,19.6 M 29.9,22.3 L 29.7,21.5 L 29.1,21.0 L 29.1,20.1 L 28.8,18.8 L 28.3,18.6 L 27.5,18.1 L 27.1,18.2 L 26.7,17.8 L 26.2,16.9 L 26.1,17.1 L 26.4,18.1 L 26.3,18.5 L 26.1,18.8 L 25.4,19.0 L 25.3,19.1 L 25.4,19.3 L 26.0,19.4 L 26.3,19.6 L 27.1,20.7 L 27.0,21.1 L 25.6,20.9 L 24.7,20.4 L 23.6,20.2 L 23.0,19.9 L 22.8,20.0 L 23.2,20.6 L 24.0,20.9 L 24.2,21.9 L 24.6,21.6 L 25.4,22.3 M 36.2,22.3 L 36.3,21.8 L 36.5,21.7 M 5.8,0.0 L 5.4,0.4 L 5.0,0.4 L 4.8,0.0 M 7.5,0.0 L 7.8,0.3 L 8.2,0.0 M 10.3,0.0 L 10.7,0.2 L 11.0,0.0 M 14.7,0.0 L 13.9,0.9 L 13.7,1.5 L 14.8,1.4 L 15.1,1.0 L 15.3,0.9 L 15.7,1.3 L 15.8,1.6 L 16.2,2.0 L 16.4,1.9 L 16.6,1.5 L 16.6,1.1 L 16.2,0.5 L 16.3,0.0 M 22.1,0.0 L 22.1,1.0 L 21.3,1.7 L 20.9,2.4 L 21.1,2.8 L 21.5,2.7 L 23.2,1.2 L 23.4,0.0 M 26.4,0.0 L 27.0,0.8 L 27.0,0.0 M 34.0,0.0 L 33.8,0.4 L 33.1,0.8 L 33.0,1.2 L 34.5,0.7 L 34.5,1.5 L 33.6,3.2 L 32.6,4.6 L 32.3,4.7 L 32.1,5.1 L 30.9,5.5 L 30.6,5.5 L 29.6,5.7 L 28.5,5.3 L 27.6,5.2 L 26.1,5.9 L 26.2,6.2 L 27.5,5.9 L 28.2,6.0 L 29.3,6.7 L 29.0,7.7 L 28.1,8.8 L 28.3,9.2 L 29.5,8.8 L 30.0,7.8 L 30.4,7.4 L 31.3,7.2 L 31.7,7.8 L 32.1,7.1 L 33.5,6.5 L 33.6,6.6 L 34.1,8.3 L 35.0,9.0 L 35.2,8.1 L 34.9,6.1 L 35.1,5.8 L 35.4,5.6 L 36.0,4.1 L 36.3,3.8 L 36.5,2.6 M 4.1,0.1 L 4.4,0.3 L 4.3,0.7 L 4.1,0.6 L 3.9,0.3 L 3.9,0.2 L 4.1,0.1 M 6.4,1.9 L 6.5,2.0 L 6.4,2.1 L 6.2,2.0 L 6.4,1.9 M 7.6,3.0 L 8.0,3.1 L 7.7,3.1 L 7.6,3.0 M 6.1,5.7 L 6.5,5.9 L 6.1,5.9 L 6.1,5.7 M 36.5,10.6 L 36.0,10.6 L 35.8,9.9 L 35.5,9.7 L 35.3,10.9 L 34.9,11.1 L 34.4,10.2 L 34.1,10.1 L 33.8,10.5 L 34.0,11.2 L 33.8,11.8 L 32.4,11.4 L 32.2,11.9 L 31.4,12.3 L 31.6,12.7 L 32.6,12.6 L 33.8,13.2 L 33.7,13.6 L 33.1,13.6 L 33.2,14.2 L 32.9,14.4 L 32.7,14.9 L 31.8,14.6 L 31.4,14.1 L 30.8,13.6 L 29.6,13.4 L 28.7,12.8 L 28.4,12.8 L 28.2,13.0 L 28.5,13.3 L 28.6,14.2 L 29.2,14.4 L 30.3,15.7 L 30.3,15.8 L 29.9,15.8 L 29.8,16.0 L 30.1,16.8 L 30.5,17.1 L 31.1,16.8 L 31.9,17.1 L 31.0,18.1 L 31.5,18.1 L 31.8,18.3 L 31.9,18.9 L 31.5,19.1 L 30.4,19.1 L 30.2,19.3 L 30.6,20.5 L 31.0,20.8 L 31.3,20.5 L 31.9,20.8 L 31.7,21.2 L 31.8,21.7 L 31.4,22.3 M 3.7,11.7 L 4.7,12.6 L 4.6,13.1 L 4.8,13.4 L 4.8,14.1 L 4.5,14.6 L 4.8,15.2 L 4.5,15.9 L 4.5,16.4 L 4.0,17.2 L 3.3,16.3 L 3.2,15.5 L 3.3,14.1 L 3.8,13.9 L 3.7,12.9 L 3.5,12.2 L 3.7,11.7 M 7.0,12.4 L 7.1,12.4 L 7.0,12.4 M 36.5,12.4 L 36.2,12.1 L 36.5,11.6 M 0.5,14.7 L 0.7,14.9 L 0.5,15.8 L 0.4,15.7 L 0.2,15.0 L 0.5,14.7 M 6.3,16.0 L 6.5,16.1 L 6.7,16.6 L 7.1,17.0 L 7.2,18.7 L 7.3,18.8 L 7.7,18.5 L 7.9,18.6 L 8.2,19.2 L 8.2,19.8 L 8.5,20.4 L 7.9,21.6 L 7.1,21.2 L 7.1,20.9 L 6.9,20.6 L 6.9,19.5 L 6.0,17.6 L 6.0,17.2 L 6.3,16.8 L 6.3,16.0 M 36.5,16.7 L 35.9,16.5 L 35.1,16.6 L 35.2,15.9 L 35.0,15.0 L 35.8,14.1 L 36.1,14.0 L 36.3,14.4 L 36.4,15.2 L 36.5,15.4 M 1.7,16.9 L 1.8,17.0 L 2.0,17.3 L 1.6,17.1 L 1.7,16.9 M 1.2,17.1 L 1.4,17.1 L 1.4,17.3 L 1.1,17.9 L 0.8,17.9 L 0.7,17.5 L 1.0,17.4 L 1.2,17.1 M 5.1,17.3 L 5.3,17.4 L 5.6,18.1 L 5.7,19.8 L 5.6,20.1 L 5.2,20.1 L 4.8,20.3 L 4.4,20.0 L 4.5,19.2 L 3.8,18.9 L 3.6,18.5 L 3.2,18.4 L 3.1,18.2 L 4.0,18.0 L 4.1,17.7 L 4.3,18.2 L 4.8,18.3 L 4.5,17.7 L 5.1,17.3 M 36.5,20.7 L 36.1,20.6 L 35.6,19.2 L 35.8,18.9 L 36.5,18.7 M 16.1,22.3 L 16.0,21.6 L 16.4,21.2 L 16.9,21.3 L 17.7,21.7 L 18.1,21.3 L 19.2,21.1 L 19.6,20.9 L 19.6,20.8 L 19.0,20.8 L 19.3,19.8 L 18.9,19.8 L 18.5,19.3 L 19.2,18.1 L 19.2,17.8 L 18.1,18.5 L 17.3,18.9 L 17.0,18.5 L 16.6,18.4 L 16.5,18.2 L 16.2,19.0 L 15.7,19.3 L 15.9,18.0 L 15.6,17.5 L 15.0,17.6 L 14.7,18.3 L 14.5,18.4 L 14.1,18.1 L 13.8,18.8 L 13.3,19.0 L 13.4,19.4 L 12.6,19.9 L 12.2,20.0 L 11.7,19.4 L 11.5,20.6 L 11.1,20.3 L 10.6,20.1 L 10.7,18.9 L 10.5,18.3 L 10.5,17.9 L 10.4,18.0 L 10.2,17.8 L 10.8,17.3 L 11.3,17.3 L 11.5,16.8 L 12.0,16.7 L 12.2,16.1 L 10.0,16.4 L 9.6,16.1 L 10.9,15.3 L 10.8,14.9 L 9.3,15.2 L 8.0,15.7 L 7.8,15.6 L 7.3,14.7 L 7.3,14.4 L 7.5,14.3 L 7.8,14.2 L 8.0,14.4 L 8.4,14.4 L 9.0,13.9 L 8.7,13.4 L 7.9,12.8 L 9.6,12.4 L 10.1,12.5 L 10.6,12.4 L 10.9,12.2 L 11.0,11.7 L 10.8,11.5 L 10.4,11.6 L 8.9,11.2 L 8.7,11.1 L 8.3,10.2 L 7.9,10.0 L 7.8,9.7 L 6.4,9.5 L 6.1,9.0 L 6.3,8.4 L 5.8,8.1 L 5.6,7.7 L 5.8,7.6 L 6.6,7.7 L 7.7,7.3 L 7.7,7.0 L 6.7,5.9 L 7.0,5.8 L 7.5,5.9 L 8.5,6.8 L 8.8,7.8 L 9.5,8.1 L 10.5,8.8 L 11.1,9.0 L 11.4,8.8 L 11.4,8.7 L 11.2,8.3 L 10.9,8.0 L 10.9,7.6 L 9.9,6.1 L 9.9,5.9 L 10.3,5.7 L 10.0,5.4 L 10.6,5.3 L 11.2,5.6 L 11.5,5.1 L 11.9,4.8 L 11.6,4.3 L 10.7,3.8 L 10.1,2.7 L 9.6,2.8 L 9.2,2.7 L 8.8,2.5 L 8.5,2.1 L 8.6,1.7 L 9.8,1.0 L 9.8,0.4 L 9.0,0.4 L 8.1,0.8 L 7.3,0.9 L 7.0,1.3 L 6.8,1.4 L 6.6,1.0 L 7.0,0.7 L 7.1,0.2 L 7.3,0.0 M 24.4,22.3 L 24.7,21.9 L 25.0,22.3 M 31.0,22.3 L 30.7,21.8 L 30.3,21.6 L 30.1,20.9 L 29.7,20.4 L 29.8,19.8 L 29.5,18.9 L 29.4,17.8 L 29.0,16.9 L 28.6,16.5 L 28.7,17.4 L 28.3,18.0 L 27.9,17.3 L 27.4,17.1 L 27.2,17.4 L 26.6,16.3 L 25.8,15.9 L 25.6,16.3 L 25.6,16.6 L 26.0,17.5 L 25.9,18.0 L 26.0,18.4 L 25.7,18.6 L 25.2,18.5 L 24.6,18.6 L 24.6,19.1 L 25.4,19.7 L 26.0,19.8 L 26.3,20.2 L 26.3,20.5 L 25.9,20.6 L 24.6,20.0 L 23.7,19.9 L 22.7,19.0 L 22.2,19.2 L 21.9,19.8 L 22.0,20.4 L 22.7,20.7 L 22.8,21.3 L 23.5,21.3 L 23.7,21.4 L 23.9,22.3 M 13.5,0.0 L 13.7,0.1 L 13.8,0.0 M 14.3,0.0 L 13.6,0.8 L 13.0,1.3 L 13.2,1.8 L 12.9,2.1 L 13.0,2.3 L 13.2,2.4 L 13.7,2.0 L 14.5,2.0 L 14.9,2.2 L 15.1,2.1 L 15.2,1.7 L 15.8,2.1 L 16.0,2.8 L 16.4,2.9 L 17.1,2.1 L 17.0,1.5 L 17.1,1.2 L 16.4,0.5 L 16.5,0.3 L 16.8,0.2 L 16.9,0.0 M 21.0,0.0 L 21.1,0.3 L 21.8,0.3 L 21.9,0.8 L 21.0,1.5 L 20.4,2.2 L 19.6,3.7 L 19.5,4.1 L 20.2,3.7 L 20.9,4.3 L 21.1,3.2 L 21.6,3.0 L 23.1,1.6 L 23.7,1.4 L 23.6,0.0 M 24.5,0.0 L 24.3,0.7 L 25.0,0.2 L 25.3,0.4 L 26.0,0.2 L 27.2,1.7 L 27.7,1.6 L 28.0,1.2 L 27.3,0.0 M 33.7,0.0 L 33.0,0.5 L 32.0,1.6 L 31.8,2.6 L 32.0,2.7 L 32.4,2.5 L 33.6,1.3 L 34.1,1.5 L 34.1,1.8 L 33.2,3.1 L 32.6,3.7 L 31.3,4.6 L 31.2,5.0 L 29.7,5.4 L 28.6,4.9 L 27.6,4.8 L 25.0,5.7 L 24.4,6.2 L 24.5,7.2 L 24.9,7.4 L 25.5,6.7 L 26.0,6.7 L 27.5,6.2 L 28.1,6.3 L 28.9,6.8 L 28.8,7.4 L 28.4,7.9 L 26.5,9.2 L 27.7,9.8 L 28.5,9.7 L 29.3,9.1 L 29.8,9.6 L 30.0,10.0 L 30.1,10.0 L 30.3,9.6 L 29.9,8.6 L 30.4,7.9 L 31.0,7.7 L 31.4,8.0 L 31.6,8.6 L 31.4,9.7 L 31.8,9.6 L 32.2,7.4 L 33.2,6.9 L 33.4,7.0 L 33.3,7.4 L 33.5,7.8 L 33.7,8.1 L 33.5,8.8 L 34.0,8.6 L 34.2,9.1 L 34.1,9.3 L 33.4,9.4 L 33.3,9.6 L 33.5,10.1 L 33.0,10.1 L 32.8,10.3 L 33.0,10.8 L 33.6,11.0 L 33.6,11.4 L 32.9,11.3 L 31.2,10.4 L 31.1,10.5 L 31.2,10.9 L 31.7,11.3 L 31.8,11.6 L 31.5,11.8 L 30.8,11.7 L 30.6,12.0 L 30.7,12.6 L 31.1,13.0 L 31.5,13.1 L 31.7,13.5 L 32.0,13.4 L 32.2,13.0 L 32.5,13.0 L 32.4,13.8 L 32.5,14.5 L 32.0,14.3 L 31.4,13.6 L 30.5,13.2 L 29.7,13.1 L 29.2,12.7 L 28.5,12.2 L 28.0,12.7 L 27.5,12.6 L 27.6,13.2 L 27.8,13.4 L 27.8,13.6 L 27.7,13.8 L 27.1,13.8 L 27.0,14.1 L 27.2,14.2 L 28.1,14.2 L 28.6,14.8 L 28.9,14.7 L 29.1,14.8 L 29.2,15.0 L 29.1,15.4 L 29.3,15.9 L 29.4,16.8 L 28.8,15.8 L 28.3,15.4 L 27.9,15.6 L 28.1,16.5 L 27.9,16.8 L 27.0,16.4 L 26.7,16.0 L 25.6,15.4 L 24.9,15.4 L 24.0,15.5 L 24.1,15.8 L 25.0,16.2 L 25.0,16.5 L 25.7,17.5 L 25.5,17.6 L 25.1,17.6 L 25.2,18.0 L 24.5,17.6 L 24.1,17.0 L 23.8,17.1 L 24.2,18.5 L 24.0,19.2 L 24.3,19.7 L 24.1,19.7 L 23.3,19.2 L 23.1,18.8 L 23.0,18.0 L 22.6,17.7 L 22.4,17.9 L 22.4,18.6 L 21.7,18.8 L 21.6,19.4 L 21.3,19.7 L 20.5,19.7 L 20.9,18.8 L 20.9,18.2 L 20.6,18.1 L 20.2,18.8 L 19.5,18.9 L 19.4,18.5 L 19.6,17.2 L 19.5,17.0 L 19.2,17.0 L 18.6,17.7 L 17.9,18.1 L 17.6,18.0 L 17.3,18.4 L 17.3,17.6 L 16.9,17.4 L 16.3,17.7 L 16.1,17.6 L 16.5,16.6 L 16.4,16.6 L 16.1,16.6 L 15.7,17.0 L 14.7,17.2 L 14.4,17.5 L 14.1,17.2 L 13.7,17.3 L 13.4,18.3 L 12.4,18.2 L 12.3,18.6 L 12.6,19.4 L 12.3,19.7 L 12.1,19.0 L 11.9,18.6 L 11.3,19.2 L 10.9,18.4 L 11.0,17.6 L 12.1,17.3 L 12.4,16.8 L 13.2,16.4 L 13.3,15.8 L 12.7,15.1 L 12.2,15.1 L 11.9,15.9 L 11.1,16.0 L 11.5,15.6 L 11.7,15.0 L 11.7,14.4 L 11.3,14.3 L 10.6,14.6 L 8.1,15.3 L 8.2,15.0 L 9.5,14.5 L 10.0,14.0 L 9.9,13.6 L 9.2,13.4 L 9.1,13.1 L 9.6,12.6 L 10.4,12.8 L 10.8,12.7 L 11.2,11.7 L 11.0,11.3 L 10.5,11.0 L 10.0,11.1 L 9.1,10.9 L 9.0,10.7 L 9.3,10.2 L 9.3,10.0 L 8.6,9.6 L 8.4,9.2 L 7.6,9.2 L 7.5,8.3 L 8.2,7.9 L 8.7,8.3 L 9.3,8.4 L 9.6,8.7 L 11.3,9.5 L 12.0,9.3 L 11.6,8.5 L 11.6,8.1 L 10.9,7.2 L 10.7,6.6 L 10.4,6.4 L 10.3,6.2 L 10.9,5.9 L 11.5,5.8 L 12.0,6.2 L 12.8,6.1 L 12.6,5.8 L 12.1,5.6 L 12.4,4.9 L 12.0,4.0 L 11.9,3.9 L 11.3,3.9 L 11.1,3.5 L 11.2,2.9 L 10.8,2.7 L 10.7,2.5 L 11.0,1.7 L 10.9,1.3 L 10.8,1.0 L 10.3,0.9 L 10.3,0.5 L 11.0,0.5 L 11.5,0.2 L 11.7,1.0 L 11.9,1.1 L 12.4,0.3 L 12.9,0.0 M 9.8,2.0 L 10.0,2.0 L 9.9,2.2 L 9.4,2.2 L 9.8,2.0 M 34.5,9.3 L 34.6,9.4 L 34.6,9.6 L 34.5,9.3 M 36.5,9.3 L 35.6,9.0 L 35.7,8.1 L 35.5,7.6 L 35.2,6.4 L 35.3,6.2 L 35.7,6.9 L 35.9,6.9 L 35.9,5.7 L 36.0,4.7 L 36.3,4.3 L 36.5,4.4 M 36.5,10.2 L 36.3,10.2 L 36.2,10.1 L 36.5,9.9 M 4.3,13.7 L 4.5,13.9 L 4.3,14.1 L 4.2,13.9 L 4.3,13.7 M 35.5,15.0 L 35.8,15.1 L 36.2,16.1 L 35.9,16.1 L 35.5,15.6 L 35.4,15.2 L 35.5,15.0 M 3.8,15.4 L 3.8,15.7 L 3.8,15.4 M 29.6,17.1 L 29.9,17.1 L 30.2,17.6 L 31.0,17.3 L 31.1,17.4 L 30.9,17.7 L 30.4,17.8 L 30.2,18.3 L 30.0,18.4 L 29.6,17.1 M 7.6,19.0 L 7.8,19.1 L 8.1,20.1 L 7.8,20.4 L 7.7,21.1 L 7.3,20.4 L 7.4,19.9 L 7.2,19.2 L 7.6,19.0 M 5.4,19.4 L 5.4,19.6 L 5.4,19.4 M 11.2,19.4 L 11.1,19.6 L 11.2,19.4 M 24.8,19.7 L 25.1,19.9 L 24.8,19.7 M 16.6,22.3 L 16.6,21.9 L 16.3,21.6 L 16.5,21.4 L 17.4,22.3 M 17.8,22.3 L 18.1,22.1 L 18.6,21.5 L 19.1,21.5 L 19.6,21.3 L 19.9,21.5 L 20.3,21.0 L 20.7,21.0 L 20.9,20.8 L 21.3,21.3 L 21.8,21.0 L 22.0,21.0 L 22.5,21.7 L 22.4,22.3 M 19.0,22.3 L 18.7,22.0 L 18.5,22.3 M 23.1,22.3 L 23.4,21.9 L 23.5,22.3 M 19.2,0.0 L 19.3,0.2 L 19.7,0.3 L 20.3,0.0 M 20.5,0.0 L 20.5,0.4 L 20.9,0.7 L 20.9,0.9 L 20.6,1.2 L 19.8,1.0 L 19.4,1.1 L 19.8,2.0 L 19.9,2.8 L 19.6,3.2 L 18.2,4.3 L 18.3,4.6 L 18.8,4.6 L 19.2,5.1 L 19.5,5.1 L 19.8,5.3 L 20.2,5.4 L 20.9,5.3 L 21.1,4.9 L 21.6,4.3 L 21.6,3.7 L 22.2,3.6 L 22.1,3.0 L 23.1,2.0 L 23.6,2.4 L 23.5,3.0 L 23.8,3.4 L 24.2,2.3 L 24.2,1.6 L 24.9,1.0 L 25.4,1.2 L 25.7,0.9 L 26.1,1.4 L 26.6,1.4 L 26.7,1.7 L 26.2,2.3 L 26.2,2.6 L 27.0,2.4 L 27.4,2.9 L 27.6,2.8 L 27.7,2.4 L 27.9,2.3 L 28.5,2.6 L 29.0,2.5 L 29.3,3.0 L 29.6,3.0 L 29.7,2.6 L 29.5,2.0 L 28.2,0.6 L 29.0,0.7 L 29.5,0.3 L 29.5,0.0 M 28.1,0.0 L 28.1,0.5 L 27.7,0.0 M 30.9,0.0 L 31.1,0.3 L 31.4,0.0 M 31.8,0.0 L 32.3,0.3 L 32.3,0.5 L 32.1,0.6 L 31.2,0.5 L 30.7,1.3 L 30.7,1.8 L 30.4,2.1 L 30.6,2.5 L 30.6,3.7 L 31.2,3.8 L 31.7,3.7 L 31.6,3.9 L 30.9,4.2 L 29.5,4.4 L 29.3,4.8 L 28.6,4.6 L 26.6,4.5 L 26.0,5.0 L 24.8,5.4 L 24.2,5.8 L 23.5,5.9 L 23.0,6.4 L 22.9,7.1 L 23.4,6.9 L 24.1,7.0 L 23.7,8.0 L 23.9,8.6 L 24.5,8.9 L 25.1,8.1 L 25.5,6.9 L 25.8,6.9 L 26.1,7.2 L 26.4,6.9 L 27.5,6.6 L 28.3,7.0 L 28.3,7.2 L 28.0,7.9 L 25.5,9.2 L 25.2,9.4 L 25.4,9.7 L 26.0,9.7 L 26.3,10.0 L 26.9,9.7 L 27.7,10.3 L 28.2,9.9 L 28.6,10.0 L 29.4,9.8 L 29.5,10.0 L 29.3,10.4 L 29.5,10.6 L 30.1,10.4 L 30.6,10.1 L 30.6,10.8 L 30.3,11.1 L 30.5,11.5 L 30.4,12.9 L 30.0,13.0 L 29.5,12.7 L 29.4,12.3 L 28.9,12.3 L 28.7,11.9 L 27.9,11.7 L 27.2,11.9 L 26.5,12.6 L 26.6,12.9 L 27.0,13.1 L 26.3,13.2 L 26.6,14.2 L 27.0,14.7 L 27.6,14.9 L 27.3,15.5 L 26.8,15.3 L 26.6,15.5 L 26.3,15.6 L 25.6,15.1 L 24.8,15.0 L 24.5,15.1 L 23.5,14.8 L 23.2,14.9 L 23.2,15.5 L 23.6,16.2 L 23.3,16.8 L 23.5,17.6 L 23.5,18.2 L 23.1,17.5 L 22.7,17.2 L 22.3,17.2 L 22.1,17.5 L 21.6,17.8 L 20.6,17.3 L 20.0,17.6 L 19.9,16.7 L 19.5,16.4 L 18.4,17.2 L 17.8,17.1 L 17.7,16.8 L 17.4,16.8 L 17.2,16.5 L 17.0,16.5 L 16.9,16.1 L 16.7,16.0 L 16.4,16.2 L 16.0,16.3 L 15.7,16.6 L 14.7,16.5 L 14.3,16.8 L 13.8,16.6 L 13.7,16.2 L 14.0,15.5 L 13.5,15.6 L 13.0,15.3 L 13.0,15.0 L 13.2,14.6 L 13.0,14.2 L 12.6,14.3 L 12.3,13.8 L 11.0,14.1 L 10.6,14.4 L 10.4,14.2 L 10.5,13.3 L 11.0,13.2 L 11.2,12.9 L 11.5,11.7 L 11.3,11.3 L 11.6,11.0 L 11.4,10.8 L 10.9,10.9 L 10.6,10.6 L 10.0,10.7 L 9.9,10.1 L 9.2,9.1 L 10.1,9.3 L 10.6,9.6 L 11.1,9.6 L 11.7,9.9 L 12.0,9.9 L 12.4,9.6 L 12.7,8.9 L 12.1,8.7 L 12.1,8.1 L 11.6,7.7 L 11.1,6.3 L 11.5,6.2 L 11.9,6.7 L 12.6,6.6 L 13.4,6.8 L 13.6,6.7 L 12.7,5.1 L 13.1,4.1 L 13.0,3.7 L 12.5,3.0 L 12.2,3.1 L 11.6,3.4 L 12.0,2.6 L 11.3,2.4 L 11.4,2.1 L 11.7,1.9 L 11.3,1.5 L 11.2,1.1 L 11.8,1.4 L 12.5,1.1 L 12.2,1.6 L 12.2,1.9 L 12.9,2.8 L 13.5,3.1 L 13.9,3.0 L 14.4,2.7 L 14.9,2.9 L 15.3,2.9 L 15.6,3.1 L 15.7,3.6 L 16.2,3.5 L 16.7,3.6 L 16.8,4.4 L 17.1,4.5 L 17.9,3.8 L 17.8,2.8 L 18.1,2.3 L 17.7,2.0 L 17.5,1.5 L 17.7,1.4 L 18.3,1.5 L 18.6,1.3 L 18.8,1.1 L 18.5,0.8 L 17.1,0.8 L 17.3,0.2 L 17.8,0.3 L 18.1,0.0 M 13.2,0.4 L 13.4,0.5 L 13.4,0.7 L 13.0,1.0 L 12.7,1.0 L 12.7,0.7 L 13.2,0.4 M 36.5,6.4 L 36.3,5.8 L 36.3,5.0 L 36.5,4.8 M 32.7,7.5 L 32.8,7.5 L 33.0,7.8 L 32.6,9.2 L 32.8,9.8 L 32.5,10.2 L 32.4,10.5 L 32.3,10.6 L 31.9,10.3 L 32.3,9.8 L 32.4,8.0 L 32.7,7.5 M 30.5,8.2 L 30.7,8.2 L 30.7,8.5 L 30.9,8.5 L 31.2,9.2 L 31.0,9.7 L 30.6,10.0 L 30.6,9.4 L 30.2,8.7 L 30.5,8.2 M 30.9,8.3 L 31.0,8.4 L 30.9,8.3 M 13.0,17.1 L 13.3,17.2 L 13.1,17.5 L 13.2,17.8 L 13.1,17.9 L 12.9,17.8 L 13.0,17.1 M 20.3,21.5 L 20.8,21.5 L 21.2,21.8 L 20.8,22.0 L 20.3,21.9 L 20.2,21.7 L 20.3,21.5 M 19.7,22.3 L 19.7,22.0 L 19.9,21.8 L 20.0,22.0 L 20.0,22.3 M 21.7,22.3 L 21.4,21.8 L 21.8,21.5 L 22.1,21.8 L 22.1,22.3 M 30.4,0.0 L 30.3,0.4 L 30.4,0.8 L 30.1,1.0 L 29.8,0.6 L 29.8,0.0 M 19.5,0.6 L 19.5,0.7 L 19.5,0.6 M 29.5,1.2 L 30.0,1.4 L 29.9,1.8 L 29.5,1.2 M 24.7,1.6 L 25.3,2.1 L 25.9,1.9 L 25.9,2.0 L 25.3,2.7 L 25.7,2.8 L 25.8,3.4 L 26.2,3.4 L 26.8,3.8 L 25.8,3.9 L 25.5,4.1 L 25.6,4.8 L 25.4,5.0 L 23.2,5.7 L 22.6,6.2 L 22.5,6.8 L 21.8,7.2 L 22.7,7.7 L 23.5,7.5 L 22.9,8.1 L 22.8,8.4 L 23.1,9.1 L 23.4,9.3 L 23.9,9.5 L 24.1,9.9 L 24.6,10.1 L 25.1,9.9 L 25.8,10.2 L 26.0,10.4 L 26.1,10.9 L 26.9,10.7 L 27.1,10.2 L 27.3,10.3 L 27.4,10.9 L 27.0,11.1 L 26.1,12.5 L 25.6,12.5 L 25.4,12.6 L 26.2,14.2 L 25.7,14.3 L 25.7,14.8 L 25.1,14.8 L 24.1,14.4 L 23.7,14.0 L 23.3,14.1 L 22.6,13.9 L 22.5,14.4 L 23.0,16.1 L 22.7,16.3 L 22.4,16.2 L 22.0,16.3 L 21.8,15.9 L 21.2,16.7 L 20.6,16.8 L 20.4,16.5 L 20.4,15.9 L 20.0,15.6 L 19.5,15.6 L 19.1,16.4 L 18.7,16.3 L 18.3,16.6 L 17.9,16.1 L 17.4,15.8 L 17.1,15.9 L 16.6,15.5 L 16.2,15.9 L 15.9,16.0 L 15.6,15.8 L 14.8,15.7 L 14.2,15.0 L 13.6,15.2 L 13.7,14.7 L 13.4,14.3 L 13.2,13.7 L 12.5,13.3 L 11.2,13.6 L 11.6,13.1 L 11.6,12.0 L 11.9,11.8 L 12.1,11.4 L 11.8,10.6 L 11.2,10.4 L 11.0,10.2 L 11.2,10.0 L 11.9,10.2 L 12.5,10.2 L 12.7,10.0 L 13.0,8.9 L 12.5,8.4 L 12.4,8.0 L 11.9,7.6 L 11.9,7.4 L 12.8,7.5 L 13.3,7.2 L 13.9,7.1 L 14.2,6.9 L 14.1,6.7 L 13.7,6.3 L 13.1,5.2 L 13.5,5.0 L 14.1,4.5 L 14.1,3.7 L 14.6,3.6 L 15.3,3.9 L 15.9,4.0 L 16.0,4.3 L 16.4,4.4 L 16.5,5.2 L 16.9,5.6 L 17.5,5.6 L 17.8,5.2 L 18.8,5.7 L 19.4,5.7 L 19.9,6.1 L 21.1,6.4 L 21.3,6.1 L 21.4,5.2 L 22.0,4.4 L 22.4,4.4 L 22.8,4.6 L 23.0,4.5 L 23.1,4.0 L 22.6,3.0 L 23.1,2.5 L 23.2,2.6 L 23.1,3.1 L 23.2,3.3 L 23.3,4.1 L 23.6,4.4 L 23.9,4.4 L 24.5,4.2 L 24.5,3.5 L 24.2,3.2 L 24.2,3.0 L 24.2,2.8 L 24.5,2.8 L 24.5,1.9 L 24.7,1.6 M 18.6,1.8 L 19.0,1.9 L 19.0,2.6 L 19.5,2.6 L 19.5,2.8 L 18.4,3.7 L 18.3,3.6 L 18.7,2.9 L 18.6,1.8 M 28.0,3.4 L 28.5,3.7 L 28.9,3.5 L 29.2,3.8 L 28.3,4.0 L 27.3,3.8 L 27.5,3.5 L 27.8,3.6 L 28.0,3.4 M 29.6,3.6 L 29.8,3.6 L 29.9,4.0 L 29.5,3.9 L 29.6,3.6 M 27.0,7.1 L 27.3,7.1 L 27.6,7.6 L 27.6,7.7 L 26.9,8.2 L 25.2,8.8 L 25.6,7.3 L 26.1,7.7 L 26.3,7.7 L 26.5,7.6 L 26.7,7.1 L 27.0,7.1 M 10.4,10.0 L 10.7,10.2 L 10.3,10.3 L 10.3,10.1 L 10.4,10.0 M 28.3,10.3 L 28.7,10.6 L 29.0,11.0 L 29.3,10.9 L 29.9,10.9 L 30.1,11.7 L 29.9,12.4 L 29.8,12.4 L 29.3,11.7 L 28.3,11.6 L 27.9,11.3 L 27.6,10.9 L 28.3,10.3 M 14.2,16.0 L 14.4,16.2 L 14.4,16.3 L 14.2,16.2 L 14.2,16.0 M 15.1,4.7 L 15.4,4.8 L 15.7,5.1 L 16.6,5.8 L 16.9,6.4 L 17.5,6.6 L 18.1,6.1 L 18.9,6.3 L 19.3,6.2 L 19.8,6.8 L 20.4,7.1 L 21.1,7.0 L 21.3,6.9 L 21.6,6.0 L 21.6,5.4 L 21.8,5.1 L 22.1,5.3 L 22.6,5.3 L 22.6,5.6 L 21.9,6.2 L 21.8,6.6 L 21.4,7.0 L 21.3,7.6 L 21.5,7.7 L 22.0,7.7 L 22.4,8.0 L 22.2,8.8 L 22.6,9.3 L 23.6,9.9 L 24.1,10.4 L 25.5,10.5 L 25.6,11.0 L 26.1,11.5 L 25.8,11.8 L 25.3,12.0 L 25.2,12.2 L 25.2,12.9 L 25.6,13.7 L 25.5,14.0 L 24.7,14.0 L 23.8,13.5 L 23.2,13.8 L 22.9,13.4 L 22.7,13.4 L 22.0,13.9 L 22.1,14.9 L 21.7,15.3 L 21.2,16.0 L 21.0,16.0 L 19.9,14.9 L 19.4,15.1 L 18.9,15.9 L 18.5,15.9 L 18.2,15.5 L 16.9,15.4 L 16.6,15.1 L 16.0,15.3 L 14.9,15.1 L 14.1,14.4 L 13.7,14.3 L 13.9,14.1 L 13.9,13.6 L 13.4,12.9 L 13.1,12.8 L 12.0,13.0 L 11.9,12.6 L 12.0,12.3 L 12.4,12.4 L 12.9,11.7 L 12.6,11.3 L 12.3,10.5 L 13.0,10.4 L 13.3,10.0 L 13.2,9.4 L 13.3,8.8 L 12.8,8.2 L 12.7,7.9 L 13.9,7.5 L 14.5,7.5 L 14.8,7.3 L 14.8,7.0 L 13.9,6.1 L 13.7,5.5 L 14.4,5.2 L 14.7,4.8 L 15.1,4.7 M 23.7,4.8 L 23.8,5.0 L 23.6,5.2 L 23.5,5.0 L 23.7,4.8 M 22.5,15.4 L 22.5,15.5 L 22.5,15.4 M 14.6,5.5 L 15.4,5.9 L 15.9,6.0 L 17.0,7.0 L 18.2,7.3 L 18.4,7.2 L 18.5,6.7 L 19.1,6.7 L 19.6,7.3 L 20.0,7.6 L 21.0,7.6 L 21.3,8.1 L 21.9,8.0 L 22.0,8.3 L 21.7,9.0 L 22.1,9.7 L 22.7,10.1 L 23.4,10.2 L 24.0,10.6 L 24.9,10.8 L 25.1,11.0 L 25.2,11.6 L 24.8,11.9 L 24.6,12.5 L 24.7,13.3 L 24.0,13.0 L 23.6,13.0 L 23.3,13.4 L 22.7,13.1 L 22.5,13.1 L 22.2,13.5 L 21.7,13.8 L 21.6,14.6 L 21.2,15.2 L 20.4,15.0 L 19.9,14.5 L 19.0,14.8 L 18.7,15.3 L 18.3,15.0 L 17.3,15.0 L 16.8,14.7 L 16.4,14.8 L 15.9,14.6 L 15.2,14.7 L 14.8,14.1 L 14.4,13.9 L 14.4,13.4 L 14.2,13.0 L 13.2,12.3 L 13.5,11.0 L 13.3,10.7 L 13.6,10.6 L 13.9,10.3 L 13.5,8.4 L 14.3,8.1 L 15.0,7.7 L 15.3,7.3 L 15.2,6.9 L 14.6,6.4 L 14.6,6.0 L 14.3,5.8 L 14.6,5.5 M 15.4,6.6 L 16.1,6.8 L 17.0,7.6 L 17.6,7.8 L 18.5,7.8 L 18.8,7.3 L 19.8,8.1 L 20.3,8.2 L 20.7,8.2 L 21.3,8.6 L 21.2,8.9 L 21.3,9.4 L 22.1,10.6 L 22.3,10.7 L 22.9,10.5 L 23.2,10.9 L 24.3,11.3 L 24.5,11.6 L 24.4,12.0 L 24.1,12.3 L 23.6,12.1 L 23.3,12.2 L 23.0,12.8 L 22.5,12.5 L 22.3,12.6 L 21.5,13.6 L 21.1,14.3 L 20.9,14.5 L 20.5,14.5 L 19.8,14.0 L 19.2,14.1 L 18.5,14.6 L 17.4,14.6 L 16.9,14.2 L 15.6,14.1 L 15.2,13.7 L 14.5,12.5 L 14.2,12.2 L 13.8,12.1 L 14.2,11.6 L 14.1,11.2 L 14.3,10.6 L 14.0,9.9 L 14.4,8.7 L 15.1,8.3 L 15.6,7.6 L 15.4,6.6 M 16.0,7.4 L 16.4,7.4 L 17.2,8.2 L 18.2,8.4 L 18.9,7.8 L 19.5,8.5 L 20.2,8.8 L 20.6,8.6 L 20.9,9.8 L 21.6,10.9 L 21.9,11.0 L 22.5,10.9 L 23.0,11.3 L 22.7,12.1 L 21.8,12.0 L 21.5,12.8 L 21.0,13.2 L 21.0,13.7 L 20.8,13.9 L 19.4,13.7 L 18.9,13.9 L 18.5,14.2 L 17.8,14.3 L 16.9,13.8 L 16.0,13.8 L 15.9,13.4 L 15.5,13.2 L 15.3,12.5 L 14.8,11.7 L 14.5,10.0 L 14.9,8.9 L 15.9,8.1 L 16.0,7.4 M 16.4,7.8 L 16.6,7.9 L 17.0,8.4 L 17.4,8.4 L 18.0,8.8 L 18.3,8.7 L 18.9,8.3 L 19.0,8.8 L 19.5,9.0 L 20.4,9.6 L 20.5,10.2 L 21.3,11.5 L 22.3,11.2 L 22.5,11.4 L 22.4,11.6 L 22.1,11.8 L 21.3,11.5 L 21.1,12.5 L 20.7,12.8 L 20.5,13.2 L 18.6,13.5 L 18.2,13.9 L 17.9,13.9 L 17.5,13.6 L 17.2,13.6 L 16.8,13.4 L 16.3,13.5 L 16.3,12.9 L 15.7,12.7 L 15.7,12.3 L 15.5,11.8 L 15.1,11.4 L 15.3,10.9 L 14.8,10.4 L 14.9,9.8 L 15.2,9.3 L 15.8,8.6 L 16.2,8.2 L 16.4,7.8 M 16.5,8.5 L 17.4,8.7 L 17.8,9.0 L 18.7,8.8 L 18.9,9.2 L 19.4,9.3 L 19.7,9.7 L 20.0,9.8 L 20.7,11.5 L 20.6,12.2 L 20.2,12.4 L 20.0,12.8 L 19.5,12.8 L 18.9,13.2 L 18.5,13.3 L 18.1,13.5 L 17.6,13.2 L 17.3,13.3 L 16.7,13.1 L 16.6,12.6 L 16.0,12.5 L 16.0,11.6 L 15.6,11.4 L 15.7,10.8 L 15.2,10.4 L 15.1,10.1 L 15.9,8.7 L 16.5,8.5 M 16.5,8.7 L 17.4,8.9 L 17.8,9.2 L 18.5,9.1 L 18.9,9.6 L 19.3,9.7 L 19.8,10.1 L 20.1,10.7 L 20.2,11.2 L 20.1,11.9 L 19.8,12.4 L 19.3,12.4 L 18.8,12.9 L 18.1,13.2 L 17.8,12.9 L 17.3,13.0 L 17.0,12.9 L 16.7,12.4 L 16.3,12.3 L 16.5,11.8 L 16.4,11.2 L 16.1,11.0 L 15.9,10.6 L 15.5,10.3 L 15.4,10.1 L 16.1,8.9 L 16.5,8.7 M 16.4,8.9 L 17.8,9.4 L 18.4,9.3 L 18.8,9.8 L 19.3,10.0 L 19.9,10.9 L 19.8,11.6 L 19.7,12.1 L 19.2,12.2 L 18.6,12.7 L 18.1,12.8 L 17.7,12.7 L 17.2,12.7 L 16.8,12.1 L 16.7,10.7 L 16.4,10.4 L 15.7,10.0 L 16.4,8.9 M 16.5,9.2 L 17.8,9.6 L 18.4,9.6 L 18.6,10.0 L 19.1,10.3 L 19.5,10.9 L 19.5,11.4 L 19.3,11.8 L 18.5,12.5 L 17.3,12.4 L 17.0,11.9 L 16.9,10.4 L 16.1,9.9 L 16.5,9.2 M 16.5,9.5 L 18.2,9.8 L 18.4,10.2 L 18.9,10.5 L 19.2,11.0 L 19.1,11.6 L 18.4,12.1 L 17.5,12.2 L 17.2,11.7 L 17.3,10.6 L 16.9,10.1 L 16.4,9.8 L 16.5,9.5 M 17.0,9.8 L 17.3,9.9 L 17.4,10.0 L 17.2,10.1 L 17.0,9.8 M 18.1,10.6 L 18.7,10.8 L 18.9,11.3 L 18.3,11.8 L 17.7,12.0 L 17.5,11.7 L 17.7,11.0 L 18.1,10.6" fill="none" stroke="currentColor" stroke-width="1.1" vector-effect="non-scaling-stroke" stroke-linejoin="round" />
+</svg>
+    <div class="hero-inner">
+      <span class="eyebrow">GIS Engineer &middot; Seattle, WA</span>
+      <h1 class="name">Kelin Christi</h1>
+      <p class="tagline">
+        I build geospatial tools that run on real public data &mdash; vector
+        quality audits, cloud-native raster pipelines, and computer-vision
+        classification.
+      </p>
+      <div class="coords">
+        <span>47.6062&deg; N, 122.3321&deg; W</span>
+        <span>github.com/crikeli</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+
+    <section id="about">
+      <div class="section-label">About</div>
+      <div class="about-grid">
+        <img class="headshot" src="headshot.jpg" alt="Portrait of Kelin Christi">
+        <div class="about-body">
+          <p>
+            I live in Seattle with my wife and our cat, Bucket. I'm a
+            software engineer who's ended up pulled toward geospatial
+            work &mdash; not because maps are novel, but because local GIS
+            data is one of the most direct ways to actually see how a city
+            or county is functioning, and where it isn't.
+          </p>
+          <p>
+            I think GIS has the potential for genuinely profound insight
+            into how communities work: where resources are under- or
+            over-allocated, where an official designation doesn't match
+            what's really on the ground, where a dataset everyone relies on
+            has quietly gone stale. The KC Data Quality Audit and Seattle
+            Urban Forest Wildfire Risk projects below both grew out of that
+            belief &mdash; one checks whether King County's own public
+            datasets can be trusted, the other checks whether the county's
+            wildfire risk designation actually covers the places that look
+            risky on the ground.
+          </p>
+          <p>
+            I like working with satellite and aerial imagery through
+            traditional computer vision workflows, and I like just as much
+            getting my hands into messy, real-world data and making sense
+            of it &mdash; parcel records, assessor photos, crime reports,
+            whatever a county or city actually publishes.
+          </p>
+          <p>
+            I'm also a proponent of agentic software development &mdash;
+            with real guardrails, not blind delegation. AI can speed up how
+            fast you build something, but it shouldn't replace understanding
+            what you built.
+          </p>
+          <p class="pull-quote">
+            &ldquo;You can outsource your thinking, but you can't outsource
+            your understanding.&rdquo;
+          </p>
+          <p class="pull-quote-cite">&mdash; Andrej Karpathy</p>
+          <dl class="skills">
+            <div class="skill-row">
+              <dt>Geospatial</dt>
+              <dd>QGIS, ArcGIS, GeoPandas, xarray / rioxarray, xarray-spatial, STAC, Cloud-Optimized GeoTIFF</dd>
+            </div>
+            <div class="skill-row">
+              <dt>Data &amp; backend</dt>
+              <dd>Python, SQL, Pandas, scikit-learn</dd>
+            </div>
+            <div class="skill-row">
+              <dt>Web &amp; apps</dt>
+              <dd>Streamlit, Leaflet, self-contained HTML/JS</dd>
+            </div>
+            <div class="skill-row">
+              <dt>Workflow</dt>
+              <dd>Agentic, AI-assisted development, Git, GitHub Actions / CI</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects">
+      <div class="section-label">Projects</div>
+      <div class="project-grid">
+
+        <a class="project-card" href="https://crikeli.github.io/seattle-house-styles/" target="_blank" rel="noopener">
+          <div class="project-head">
+            <span class="project-title">Seattle House Styles</span>
+            <span class="status">Live</span>
+          </div>
+          <p class="project-desc">
+            Classifies the architectural style of Seattle homes from King
+            County Assessor property photos using a Claude vision model,
+            then maps the results &mdash; published with King County's written
+            permission.
+          </p>
+          <div class="stack-row">
+            <span class="stack-tag">Python</span>
+            <span class="stack-tag">GeoPandas</span>
+            <span class="stack-tag">Claude Vision</span>
+            <span class="stack-tag">Leaflet</span>
+          </div>
+          <span class="project-link">crikeli.github.io/seattle-house-styles &rarr;</span>
+        </a>
+
+        <a class="project-card" href="https://crikeli.github.io/kc-data-quality-audit/" target="_blank" rel="noopener">
+          <div class="project-head">
+            <span class="project-title">KC Data Quality Audit</span>
+            <span class="status">Live &middot; daily refresh</span>
+          </div>
+          <p class="project-desc">
+            Rule-based data-quality auditor covering 18 King County GIS Open
+            Data datasets &mdash; geometry validity, staleness, cross-dataset
+            schema consistency &mdash; rebuilt automatically every day.
+          </p>
+          <div class="stack-row">
+            <span class="stack-tag">Python</span>
+            <span class="stack-tag">GeoPandas</span>
+            <span class="stack-tag">Streamlit</span>
+            <span class="stack-tag">GitHub Actions</span>
+          </div>
+          <span class="project-link">crikeli.github.io/kc-data-quality-audit &rarr;</span>
+        </a>
+
+        <a class="project-card" href="https://crikeli.github.io/seattle-wildfire-risk/" target="_blank" rel="noopener">
+          <div class="project-head">
+            <span class="project-title">Seattle Urban Forest Wildfire Risk</span>
+            <span class="status">Live</span>
+          </div>
+          <p class="project-desc">
+            A terrain-driven wildfire exposure index across three Seattle
+            parks, built on Cloud-Optimized GeoTIFFs and STAC, compared
+            against King County's official Wildland-Urban Interface
+            designation.
+          </p>
+          <div class="stack-row">
+            <span class="stack-tag">rioxarray</span>
+            <span class="stack-tag">xarray-spatial</span>
+            <span class="stack-tag">STAC</span>
+            <span class="stack-tag">Leaflet</span>
+          </div>
+          <span class="project-link">crikeli.github.io/seattle-wildfire-risk &rarr;</span>
+        </a>
+
+        <a class="project-card" href="https://crikeli.github.io/seattle-crime-hotspots/" target="_blank" rel="noopener">
+          <div class="project-head">
+            <span class="project-title">Seattle Crime Hotspots</span>
+            <span class="status">Live</span>
+          </div>
+          <p class="project-desc">
+            Spatial hotspot analysis of Seattle theft crime, comparing
+            kernel density estimation against FDR-corrected Getis-Ord Gi*
+            &mdash; and showing why the statistically rigorous method is the
+            one to trust.
+          </p>
+          <div class="stack-row">
+            <span class="stack-tag">Python</span>
+            <span class="stack-tag">GeoPandas</span>
+            <span class="stack-tag">Spatial Statistics</span>
+            <span class="stack-tag">Leaflet</span>
+          </div>
+          <span class="project-link">crikeli.github.io/seattle-crime-hotspots &rarr;</span>
+        </a>
+
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="section-label">Contact</div>
+      <div class="contact-row">
+        <a href="mailto:christik.dev@gmail.com">christik.dev@gmail.com</a>
+        <a href="https://github.com/crikeli" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </section>
+
+  </div>
+
+  <footer>
+    <div class="wrap">Built with Python, GeoPandas, and a lot of King County Open Data.</div>
+  </footer>
+
+</body>
+</html>
